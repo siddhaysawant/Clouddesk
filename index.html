@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudDesk</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===================== WELCOME SCREEN ===================== -->
+<div id="welcome-screen">
+  <div class="welcome-content">
+    <div class="welcome-label">CloudDesk</div>
+    <div class="welcome-name">Hello, <span>Siddhay</span></div>
+    <div class="welcome-tagline">Your professional workspace is loading</div>
+    <div class="welcome-bar"><div class="welcome-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <span class="logo-text">CloudDesk</span>
+    </div>
+    <div class="header-date" id="header-date"></div>
+    <div class="header-clock" id="header-clock"></div>
+    <div class="header-spacer"></div>
+    <button class="break-btn" id="break-btn" onclick="toggleBreak()">Take Break</button>
+    <div class="header-meta">
+      <div class="status-dot" id="status-dot"></div>
+      <span class="header-status" id="header-status">Working</span>
+    </div>
+    <div class="header-productivity">
+      <div class="pct-bar"><div class="pct-bar-fill" id="header-pct-bar" style="width:0%"></div></div>
+      <span id="header-pct-text">0%</span>
+    </div>
+    <div class="user-avatar">SD</div>
+  </header>
+
+  <!-- Body -->
+  <div class="app-body">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-section-label">Workspace</div>
+      <div class="sidebar-item active" data-view="tasks" onclick="switchView('tasks',this)">
+        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <span>Daily Tasks</span>
+        <span class="sidebar-badge" id="badge-tasks">5</span>
+      </div>
+      <div class="sidebar-section-label">Mail</div>
+      <div class="sidebar-item" data-view="inbox" onclick="switchView('inbox',this)">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span>Inbox</span>
+        <span class="sidebar-badge" id="badge-unread">0</span>
+      </div>
+      <div class="sidebar-section-label">Reports</div>
+      <div class="sidebar-item" data-view="analytics" onclick="switchView('analytics',this)">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Analytics</span>
+      </div>
+      <div class="sidebar-item" data-view="review" onclick="switchView('review',this)">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Task Review</span>
+      </div>
+      <div class="sidebar-item" data-view="history" onclick="switchView('history',this)">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>History</span>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-item" data-view="settings" onclick="switchView('settings',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Settings</span>
+      </div>
+    </nav>
+
+    <!-- Quick-Receive: simulate an email landing in Received, fixed bottom-left -->
+    <button class="quick-receive-btn" id="quick-receive-btn" onclick="openQuickReceive()" title="Receive a new mail">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <span>Receive Mail</span>
+    </button>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- ========== TASKS VIEW ========== -->
+      <div class="panel-view active" id="view-tasks">
+        <div class="tasks-main">
+          <div class="tasks-main-header">
+            <div class="tasks-main-title">Today's Work Tasks</div>
+            <div class="tasks-date-badge" id="tasks-date-badge"></div>
+          </div>
+          <!-- Progress Bar -->
+          <div class="tasks-progress-bar-wrap">
+            <div class="tasks-progress-info">
+              <div class="tasks-progress-count" id="tasks-progress-count">0/5</div>
+              <div class="tasks-progress-label">Tasks Complete</div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="tasks-progress-fill" style="width:0%"></div>
+            </div>
+            <div class="tasks-progress-pct" id="tasks-progress-pct">0%</div>
+          </div>
+          <!-- Task Cards Container -->
+          <div class="tasks-grid" id="tasks-grid"></div>
+        </div>
+        <!-- Session Sidebar -->
+        <aside class="session-sidebar">
+          <div class="session-sidebar-section">
+            <div class="session-section-title">Session Timer</div>
+            <div class="global-timer-display" id="global-timer">00:00:00</div>
+            <div class="global-timer-label">Active work time</div>
+            <div class="mini-progress">
+              <div class="mini-progress-fill" id="session-progress-fill" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="session-sidebar-section">
+            <div class="session-section-title">Session Info</div>
+            <div class="session-stat">
+              <span class="session-stat-label">Login Time</span>
+              <span class="session-stat-value accent" id="s-login-time">--:--</span>
+            </div>
+            <div class="session-stat">
+              <span class="session-stat-label">Logout Time</span>
+              <span class="session-stat-value success" id="s-logout-time">--:--</span>
+            </div>
+            <div class="session-stat">
+              <span class="session-stat-label">Break Time</span>
+              <span class="session-stat-value" id="s-break-time">00:00:00</span>
+            </div>
+          </div>
+          <div class="session-sidebar-section">
+            <div class="session-section-title">Performance</div>
+            <div class="session-stat">
+              <span class="session-stat-label">Correct</span>
+              <span class="session-stat-value success" id="s-correct">0</span>
+            </div>
+            <div class="session-stat">
+              <span class="session-stat-label">Incorrect</span>
+              <span class="session-stat-value danger" id="s-incorrect">0</span>
+            </div>
+            <div class="session-stat">
+              <span class="session-stat-label">Accuracy</span>
+              <span class="session-stat-value" id="s-accuracy">0%</span>
+            </div>
+            <div class="session-stat">
+              <span class="session-stat-label">Avg Task Time</span>
+              <span class="session-stat-value" id="s-avg-time">--:--</span>
+            </div>
+          </div>
+          <div class="session-sidebar-section">
+            <div class="session-section-title">Streak</div>
+            <div class="session-stat">
+              <span class="session-stat-label">Current Streak</span>
+              <span class="session-stat-value accent" id="s-streak">0 days</span>
+            </div>
+            <div class="session-stat">
+              <span class="session-stat-label">Cycle</span>
+              <span class="session-stat-value" id="s-cycle">1</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- ========== INBOX VIEW ========== -->
+      <div class="panel-view" id="view-inbox">
+        <!-- Email List -->
+        <div class="inbox-list">
+          <div class="inbox-header">
+            <div class="inbox-header-row">
+              <div class="inbox-title" id="inbox-folder-label">Received</div>
+              <button class="compose-btn" onclick="openCompose()">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Compose
+              </button>
+            </div>
+            <div class="inbox-search">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="email-search" placeholder="Search messages..." oninput="filterEmails()" />
+            </div>
+          </div>
+          <div class="inbox-tabs">
+            <div class="inbox-tab active" onclick="switchFolder('received',this)">Received</div>
+            <div class="inbox-tab" onclick="switchFolder('sent',this)">Sent by Me</div>
+            <div class="inbox-tab" onclick="switchFolder('drafts',this)">Drafts</div>
+          </div>
+          <div class="email-list" id="email-list"></div>
+        </div>
+        <!-- Reading Pane -->
+        <div class="email-reading-pane" id="email-reading-pane">
+          <div class="email-empty" id="email-empty-state">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <p>Select a message to read</p>
+          </div>
+          <div id="email-view-content" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+            <div class="email-view" id="email-view"></div>
+            <div class="email-actions" id="email-actions"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== ANALYTICS VIEW ========== -->
+      <div class="panel-view" id="view-analytics">
+        <div style="width:100%;">
+          <div class="page-title">Analytics & Performance</div>
+          <div class="analytics-grid" id="analytics-grid"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;" id="analytics-lower"></div>
+        </div>
+      </div>
+
+      <!-- ========== REVIEW VIEW ========== -->
+      <div class="panel-view" id="view-review">
+        <div style="width:100%;">
+          <div class="page-title">Task Review</div>
+          <div id="review-container"></div>
+        </div>
+      </div>
+
+      <!-- ========== HISTORY VIEW ========== -->
+      <div class="panel-view" id="view-history">
+        <div style="width:100%;">
+          <div class="page-title">Productivity History</div>
+          <div class="history-table-wrap">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Tasks</th>
+                  <th>Accuracy</th>
+                  <th>Work Time</th>
+                  <th>Break</th>
+                  <th>Avg Task</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SETTINGS VIEW ========== -->
+      <div class="panel-view" id="view-settings">
+        <div style="width:100%;">
+          <div class="page-title">Settings</div>
+          <div class="settings-card">
+            <div class="settings-card-header">Appearance</div>
+            <div class="settings-card-body">
+              <div class="theme-toggle-row">
+                <div>
+                  <div class="theme-toggle-title">Dark Theme</div>
+                  <div class="theme-toggle-sub">Switch CloudDesk to a dark colour scheme.</div>
+                </div>
+                <label class="theme-switch">
+                  <input type="checkbox" id="theme-switch-input" onchange="toggleTheme(this.checked)" />
+                  <span class="theme-switch-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="settings-card" style="margin-top:14px;">
+            <div class="settings-card-header">Data Management</div>
+            <div class="settings-card-body">
+              <button class="settings-btn" onclick="confirmReset('today')">Reset Today's Progress</button>
+              <button class="settings-btn danger" onclick="confirmReset('all')">Reset All Data</button>
+            </div>
+          </div>
+          <div class="settings-card" style="margin-top:14px;">
+            <div class="settings-card-header">About</div>
+            <div class="settings-card-body">
+              <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;">CloudDesk is your professional AWS Cloud Practitioner preparation workspace. All data is stored locally in your browser.</p>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">User: Siddhay &nbsp;|&nbsp; Version 1.0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===================== COMPOSE MODAL ===================== -->
+<div class="compose-overlay" id="compose-overlay">
+  <div class="compose-window">
+    <div class="compose-header">
+      <span>New Message</span>
+      <button class="compose-close" onclick="closeCompose()">x</button>
+    </div>
+    <div class="compose-field-row">
+      <div class="compose-field">
+        <label>From Name</label>
+        <input type="text" id="compose-from-name" placeholder="e.g. Sarah Williams" />
+      </div>
+      <div class="compose-field">
+        <label>From Email</label>
+        <input type="text" id="compose-from-email" placeholder="e.g. sarah@corp.com" />
+      </div>
+    </div>
+    <div class="compose-field">
+      <label>To</label>
+      <input type="text" id="compose-to" placeholder="Recipient" />
+    </div>
+    <div class="compose-field">
+      <label>CC</label>
+      <input type="text" id="compose-cc" placeholder="CC" />
+    </div>
+    <div class="compose-field">
+      <label>Subj</label>
+      <input type="text" id="compose-subject" placeholder="Subject" />
+    </div>
+    <div class="compose-body-field">
+      <textarea id="compose-body" placeholder="Write your message..."></textarea>
+    </div>
+    <div class="compose-footer">
+      <button class="compose-send" onclick="handleComposeSend()">Send</button>
+      <button class="compose-draft" onclick="saveDraft()">Save Draft</button>
+      <button class="compose-cancel" onclick="closeCompose()">Discard</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CONFIRM DIALOG ===================== -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3 id="confirm-title">Confirm Action</h3>
+    <p id="confirm-message">Are you sure?</p>
+    <div class="confirm-buttons">
+      <button class="confirm-btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="confirm-btn-ok" id="confirm-ok-btn" onclick="executeConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOAST CONTAINER ===================== -->
+<div id="toast-container"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
