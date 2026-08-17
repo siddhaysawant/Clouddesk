@@ -141,14 +141,24 @@ async function flushNow() {
 
 // ---------- public API ----------
 const CloudSync = {
-  status: "signed-out", // 'signed-out' | 'signing-in' | 'syncing' | 'synced' | 'error'
+  status: "initializing", // 'initializing' | 'signed-out' | 'signing-in' | 'syncing' | 'synced' | 'error'
   user: null,
+  authResolved: false, // true once Firebase has told us the real initial auth state
+  dataReadyFired: false, // true once onDataReady has fired at least once for the current session
   onStatusChange: null, // callback(status, user)
   onDataReady: null, // callback() fired once initial cloud data has been merged into localStorage
 
   setStatus(s) {
     this.status = s;
     if (typeof this.onStatusChange === "function") this.onStatusChange(s, this.user);
+  },
+
+  // script.js calls this right after attaching onStatusChange/onDataReady,
+  // in case Firebase's auth callback already fired before those were set
+  // (module scripts execute async, so this race is real, not theoretical).
+  replayCurrentState() {
+    if (typeof this.onStatusChange === "function") this.onStatusChange(this.status, this.user);
+    if (this.dataReadyFired && typeof this.onDataReady === "function") this.onDataReady();
   },
 
   async signIn() {
@@ -180,12 +190,14 @@ const CloudSync = {
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   CloudSync.user = user;
+  CloudSync.authResolved = true;
 
   if (!user) {
     if (unsubscribeSnapshot) {
       unsubscribeSnapshot();
       unsubscribeSnapshot = null;
     }
+    CloudSync.dataReadyFired = false;
     CloudSync.setStatus("signed-out");
     return;
   }
@@ -206,8 +218,10 @@ onAuthStateChanged(auth, async (user) => {
   } catch (e) {
     console.error("CloudDesk: initial sync failed", e);
     CloudSync.setStatus("error");
+    return; // don't mark dataReady/synced on failure — stay on the sign-in gate
   }
 
+  CloudSync.dataReadyFired = true;
   if (typeof CloudSync.onDataReady === "function") CloudSync.onDataReady();
   CloudSync.setStatus("synced");
 
