@@ -122,7 +122,12 @@ ul { list-style: none; }
   justify-content: center;
   flex-direction: column;
   z-index: 9999;
-  animation: welcomeFadeOut 0.6s ease 2.8s forwards;
+  /* No auto-fade timer here on purpose — this screen doubles as the
+     sign-in gate. Visibility is controlled ENTIRELY by script.js
+     (revealApp() sets display:none only after a real, confirmed sign-in
+     + cloud sync). A time-based CSS animation previously hid this
+     regardless of auth state, which made the gate look like it "vanished"
+     without actually authorizing anyone. Do not reintroduce a timer here. */
 }
 .welcome-content {
   text-align: center;
@@ -175,9 +180,6 @@ ul { list-style: none; }
 @keyframes barFill {
   from { width: 0; }
   to   { width: 100%; }
-}
-@keyframes welcomeFadeOut {
-  to { opacity: 0; pointer-events: none; }
 }
 
 /* ===================== SIGN-IN GATE ===================== */
