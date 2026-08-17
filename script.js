@@ -1596,17 +1596,35 @@ function initializeApp() {
   const tagline = document.getElementById('welcome-tagline');
   const signinBtn = document.getElementById('google-signin-btn');
 
-  // Wait for Firebase to tell us the auth state before doing anything else,
-  // so we never flash locally-cached data that's about to be overwritten by
-  // the signed-in account's cloud data (or vice versa).
-  if (!window.CloudSync) {
-    // firebase-sync.js failed to load (offline, blocked, etc). Fall back to
-    // local-only mode so the app is still usable.
-    bootAppUI();
-    revealApp('Welcome back, Siddhay. (Offline mode — sign-in unavailable.)');
-    return;
+  // firebase-sync.js is a <script type="module">, which executes
+  // asynchronously — it can genuinely still be loading when this runs on
+  // DOMContentLoaded, even though the file itself is fine. Poll briefly for
+  // window.CloudSync to show up before concluding it's actually unavailable.
+  // This prevents the "page flashes then boots without auth" bug where the
+  // offline fallback fired purely because of a load-order race.
+  let cloudSyncWaitMs = 0;
+  const CLOUD_SYNC_WAIT_LIMIT = 4000;
+  const CLOUD_SYNC_POLL_INTERVAL = 100;
+
+  function waitForCloudSync() {
+    if (window.CloudSync) {
+      attachCloudSyncHandlers();
+      return;
+    }
+    cloudSyncWaitMs += CLOUD_SYNC_POLL_INTERVAL;
+    if (cloudSyncWaitMs >= CLOUD_SYNC_WAIT_LIMIT) {
+      // Genuinely unavailable (blocked script, no network to Google's CDN,
+      // etc). Fall back to local-only mode so the app is still usable
+      // offline, rather than trapping the person on a dead sign-in screen.
+      tagline.textContent = 'Cloud sync unavailable — continuing offline.';
+      bootAppUI();
+      revealApp('Welcome back, Siddhay. (Offline mode — sign-in unavailable.)');
+      return;
+    }
+    setTimeout(waitForCloudSync, CLOUD_SYNC_POLL_INTERVAL);
   }
 
+  function attachCloudSyncHandlers() {
   window.CloudSync.onStatusChange = (status, user) => {
     updateSyncUI(status, user);
 
@@ -1645,10 +1663,32 @@ function initializeApp() {
       if (APP_STATE.currentView === 'inbox')     renderEmailList();
       return;
     }
+    // This is the ONLY path that boots the app UI. It only fires once
+    // Firebase has confirmed a signed-in user AND their cloud data has been
+    // pulled and merged into localStorage — never on a bare page load.
     appBooted = true;
     bootAppUI();
     revealApp(`Welcome back, ${window.CloudSync.user?.displayName?.split(' ')[0] || 'Siddhay'}.`);
   };
+
+  // firebase-sync.js is a module and may have already resolved the initial
+  // auth state (e.g. "signed-out") before this script attached its
+  // listeners above — replay whatever CloudSync already knows so the gate
+  // reflects reality instead of silently doing nothing.
+  window.CloudSync.replayCurrentState();
+
+  // Safety net: if Firebase's own module hasn't told us anything within a
+  // few seconds (network blocked, ad-blocker, offline), don't leave the
+  // person staring at a sign-in button that will never respond — but we
+  // still never boot straight into the app without a confirmed sign-in.
+  setTimeout(() => {
+    if (!window.CloudSync.authResolved && !appBooted) {
+      tagline.textContent = 'Having trouble reaching Google — check your connection and retry.';
+    }
+  }, 8000);
+  } // end attachCloudSyncHandlers
+
+  waitForCloudSync();
 }
 
 // Start when DOM is ready
